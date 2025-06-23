@@ -1,7 +1,21 @@
-// API 클라이언트 함수들 (나중에 구현)
-// export * from './studies.js';
-// export * from './todos.js';
-// export * from './daily-records.js';
+// Supabase 클라이언트
+export * from './supabase';
 
-// 임시 export (빌드 에러 방지)
-export const placeholder = "API functions will be implemented here";
+// API 클래스들
+export * from './studies';
+export * from './todos';
+
+import { StudiesAPI } from './studies';
+// 통합 API 클라이언트
+import type { SupabaseClient } from './supabase';
+import { TodosAPI } from './todos';
+
+export class APIClient {
+  public studies: StudiesAPI;
+  public todos: TodosAPI;
+
+  constructor(supabase: SupabaseClient) {
+    this.studies = new StudiesAPI(supabase);
+    this.todos = new TodosAPI(supabase);
+  }
+}

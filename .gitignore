@@ -95,4 +95,9 @@ supabase/.branches
 
 # Mobile
 android/
-ios/ 
+ios/ # 환경변수 파일들
+.env
+.env.local
+.env.*.local
+apps/web/.env
+apps/web/.env.local
