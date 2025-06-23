@@ -114,13 +114,15 @@
 - [x] 스터디 목록 관리 (다중 스터디 지원)
 - [x] 스터디 수정/삭제 기능 (EditStudyModal, StudyActionsMenu)
 
-### Phase 6: 통계 및 진행률 기능
+### Phase 6: 통계 및 진행률 기능 ✅
 
-- [ ] 진행률 계산 로직 구현
-- [ ] 연속 달성일 카운터
-- [ ] 주간/월간 통계 계산
-- [ ] 차트 라이브러리 연동 (recharts 등)
-- [ ] 통계 페이지 UI 구현
+- [x] 진행률 계산 로직 구현
+- [x] 연속 달성일 카운터 (StreakCounter)
+- [x] 주간/월간 통계 계산 (WeeklyStats, MonthlyStats)
+- [x] 차트 라이브러리 연동 (recharts)
+- [x] 통계 페이지 UI 구현 (StatisticsPage)
+- [x] 네비게이션에 통계 메뉴 추가
+- [x] API 메소드 확장 (getTodosByDateRange 등)
 
 ## 📱 고급 기능 구현
 

@@ -1,4 +1,4 @@
-import { BookOpen, Calendar, Home } from "lucide-react";
+import { BarChart3, BookOpen, Calendar, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
 
@@ -8,6 +8,7 @@ export default function Navigation() {
   const navItems = [
     { href: "/", label: "홈", icon: Home },
     { href: "/calendar", label: "캘린더", icon: Calendar },
+    { href: "/statistics", label: "통계", icon: BarChart3 },
   ];
 
   return (

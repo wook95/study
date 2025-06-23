@@ -5,6 +5,7 @@ import Navigation from "./components/Navigation";
 import { Toaster } from "./components/ui/toaster";
 import CalendarPage from "./pages/CalendarPage";
 import HomePage from "./pages/HomePage";
+import StatisticsPage from "./pages/StatisticsPage";
 import StudyPage from "./pages/StudyPage";
 
 // React Query 클라이언트 설정
@@ -28,6 +29,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/study/:studyId" element={<StudyPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/statistics" element={<StatisticsPage />} />
             </Routes>
           </main>
           <Toaster />
