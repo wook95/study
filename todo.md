@@ -25,7 +25,7 @@
     - [ ] react-hot-toast (알림 토스트)
 - [ ] **React Native 앱 (`apps/mobile`) 설정**
   - [ ] React Native CLI로 프로젝트 생성
-  - [ ] TypeScript 설정
+  - [ ] TypeScript **설정**
   - [ ] React Native WebView 설치
 - [ ] **개발 환경 구성**
   - [ ] Node.js, pnpm 설치
@@ -105,14 +105,14 @@
   - [ ] 폼 검증 훅 작성
 - [ ] 로컬 스토리지 연동 (오프라인 대응)
 
-### Phase 5: 스터디 관리 기능
+### Phase 5: 스터디 관리 기능 ✅
 
-- [ ] 스터디 설정 페이지
-  - [ ] 스터디 생성 폼
-  - [ ] 시작일/종료일 설정
-  - [ ] 목표 시간 설정
-- [ ] 스터디 목록 관리 (다중 스터디 지원)
-- [ ] 스터디 수정/삭제 기능
+- [x] 스터디 설정 페이지
+  - [x] 스터디 생성 폼 (CreateStudyModal)
+  - [x] 시작일/종료일 설정
+  - [x] 목표 시간 설정
+- [x] 스터디 목록 관리 (다중 스터디 지원)
+- [x] 스터디 수정/삭제 기능 (EditStudyModal, StudyActionsMenu)
 
 ### Phase 6: 통계 및 진행률 기능
 
