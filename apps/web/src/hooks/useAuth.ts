@@ -13,38 +13,40 @@ export function useAuth(): UseAuthReturn {
   const { user, isLoading, setUser, setLoading } = useAuthStore();
 
   useEffect(() => {
-    // 초기 세션 확인
-    const initializeAuth = async () => {
+    let mounted = true;
+
+    // 간단한 초기화
+    const initAuth = async () => {
       try {
-        setLoading(true);
         const session = await authApi.getSession();
-        
-        if (session?.session?.user) {
-          setUser(session.session.user);
+        if (mounted) {
+          setUser(session?.session?.user || null);
+          setLoading(false);
         }
       } catch (error) {
-        console.error("Auth initialization error:", error);
-      } finally {
-        setLoading(false);
+        console.error("Auth error:", error);
+        if (mounted) {
+          setUser(null);
+          setLoading(false);
+        }
       }
     };
 
-    initializeAuth();
-
     // 인증 상태 변경 리스너
-    const { data: { subscription } } = authApi.onAuthStateChange(
-      async (_event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-        } else {
-          setUser(null);
-        }
+    const { data: { subscription } } = authApi.onAuthStateChange((event, session) => {
+      if (mounted) {
+        setUser(session?.user || null);
         setLoading(false);
       }
-    );
+    });
 
-    return () => subscription.unsubscribe();
-  }, [setUser, setLoading]);
+    initAuth();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []); // 빈 의존성 배열
 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
