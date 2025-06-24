@@ -126,14 +126,16 @@
 
 ## 📱 고급 기능 구현
 
-### Phase 7: React Native 웹뷰 앱 설정
+### Phase 7: React Native 웹뷰 앱 설정 ✅
 
-- [ ] React Native 프로젝트 초기 설정
-- [ ] React Native WebView 설치 및 설정
-- [ ] 웹앱과 React Native 간 브릿지 통신 구현
-- [ ] WebView 설정 최적화 (보안, 성능)
+- [x] React Native 프로젝트 초기 설정 (Expo 사용)
+- [x] React Native WebView 설치 및 설정
+- [x] React 18 다운그레이드 (타입 호환성)
+- [x] WebView 설정 최적화 (보안, 성능)
+- [x] Android 네트워크 보안 설정
+- [x] 앱 설정 및 README 작성
 
-### Phase 8: 네이티브 기능 연동
+### Phase 8: 네이티브 기능 연동 🚧
 
 - [ ] React Native 로컬 푸시 알림 구현
 - [ ] 알림 권한 요청 및 스케줄링
