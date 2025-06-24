@@ -5,6 +5,7 @@ import {
   Home,
   LogIn,
   LogOut,
+  Settings,
   User,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -96,10 +97,17 @@ export default function Navigation() {
                 <>
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                     <User className="h-4 w-4" />
-                    <span>
-                      {user.user_metadata?.display_name || user.email}
-                    </span>
+                    <span>{user.user_metadata?.full_name || user.email}</span>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate("/profile")}
+                    className="flex items-center space-x-2"
+                  >
+                    <Settings className="h-4 w-4" />
+                    <span>설정</span>
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"

@@ -34,6 +34,9 @@ export default function SignupPage() {
   const signupMutation = useMutation({
     mutationFn: (data: SignupData) => authApi.signUp(data),
     onSuccess: () => {
+      // 이메일 확인 대기 상태 저장
+      localStorage.setItem("pending_verification_email", email);
+
       toast({
         title: "회원가입 성공",
         description: "이메일 확인 후 로그인해주세요.",

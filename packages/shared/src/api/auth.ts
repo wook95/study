@@ -82,4 +82,20 @@ export const createAuthApi = (supabase: SupabaseClient) => ({
   onAuthStateChange: (callback: (event: string, session: any) => void) => {
     return supabase.auth.onAuthStateChange(callback);
   },
+
+  // 새 비밀번호 설정
+  updatePassword: async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) throw error;
+  },
+
+  // 프로필 업데이트
+  updateProfile: async (updates: { full_name?: string; avatar_url?: string }) => {
+    const { error } = await supabase.auth.updateUser({
+      data: updates,
+    });
+    if (error) throw error;
+  },
 }); 
