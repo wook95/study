@@ -1,4 +1,4 @@
-import { APIClient, createSupabaseClient } from '@shared/core';
+import { APIClient, createAuthApi, createSupabaseClient } from '@shared/core';
 
 // 환경변수 체크
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -14,4 +14,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey);
 
 // API 클라이언트 생성
-export const api = new APIClient(supabase); 
+export const api = new APIClient(supabase);
+
+// Auth API 생성
+export const authApi = createAuthApi(supabase); 

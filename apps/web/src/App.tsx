@@ -5,6 +5,8 @@ import Navigation from "./components/Navigation";
 import { Toaster } from "./components/ui/toaster";
 import CalendarPage from "./pages/CalendarPage";
 import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 import StatisticsPage from "./pages/StatisticsPage";
 import StudyPage from "./pages/StudyPage";
 
@@ -26,6 +28,11 @@ function App() {
           <Navigation />
           <main className="container mx-auto px-4 py-6">
             <Routes>
+              {/* 공개 페이지 */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+
+              {/* 보호된 페이지들 - 로그인 필요 */}
               <Route path="/" element={<HomePage />} />
               <Route path="/study/:studyId" element={<StudyPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
