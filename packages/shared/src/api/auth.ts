@@ -11,9 +11,27 @@ export interface SignInData {
   password: string;
 }
 
+// 환경에 따른 기본 URL 결정
+const getBaseUrl = () => {
+  // 프로덕션 환경에서는 환경변수 또는 기본 도메인 사용
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('vercel.app') || hostname.includes('netlify.app')) {
+      return window.location.origin;
+    }
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return window.location.origin;
+    }
+  }
+  
+  // 프로덕션 기본값
+  return 'https://study-eungwon-dan-web.vercel.app';
+};
+
 export const createAuthApi = (supabase: SupabaseClient) => ({
   // 회원가입
   signUp: async ({ email, password, displayName }: SignUpData) => {
+    const baseUrl = getBaseUrl();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -21,6 +39,7 @@ export const createAuthApi = (supabase: SupabaseClient) => ({
         data: {
           display_name: displayName || email.split('@')[0],
         },
+        emailRedirectTo: `${baseUrl}/verify-email`,
       },
     });
 
@@ -61,8 +80,9 @@ export const createAuthApi = (supabase: SupabaseClient) => ({
 
   // 비밀번호 재설정 요청
   resetPassword: async (email: string) => {
+    const baseUrl = getBaseUrl();
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${baseUrl}/reset-password`,
     });
     if (error) throw error;
     return data;
@@ -70,9 +90,13 @@ export const createAuthApi = (supabase: SupabaseClient) => ({
 
   // 이메일 확인
   resendConfirmation: async (email: string) => {
+    const baseUrl = getBaseUrl();
     const { data, error } = await supabase.auth.resend({
       type: 'signup',
       email,
+      options: {
+        emailRedirectTo: `${baseUrl}/verify-email`,
+      },
     });
     if (error) throw error;
     return data;
