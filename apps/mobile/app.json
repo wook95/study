@@ -41,12 +41,6 @@
     },
     "plugins": [
       [
-        "expo-screen-orientation",
-        {
-          "initialOrientation": "PORTRAIT_UP"
-        }
-      ],
-      [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
