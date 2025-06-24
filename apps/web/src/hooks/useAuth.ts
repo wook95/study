@@ -1,59 +1,75 @@
-import type { User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
-import { authApi, supabase } from "../lib/supabase";
+import { authApi } from "@/lib/supabase";
+import { useAuthStore } from "@shared/core";
+import { useEffect } from "react";
 
-interface UseAuthReturn {
-  user: User | null;
+export interface UseAuthReturn {
+  user: any;
   isLoading: boolean;
-  isAuthenticated: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
 export function useAuth(): UseAuthReturn {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoading, setUser, setLoading } = useAuthStore();
 
   useEffect(() => {
     // 초기 세션 확인
-    const checkAuth = async () => {
+    const initializeAuth = async () => {
       try {
-        const result = await authApi.getSession();
-        setUser(result?.session?.user || null);
+        setLoading(true);
+        const session = await authApi.getSession();
+        
+        if (session?.session?.user) {
+          setUser(session.session.user);
+        }
       } catch (error) {
-        console.error("Auth check error:", error);
-        setUser(null);
+        console.error("Auth initialization error:", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    checkAuth();
+    initializeAuth();
 
     // 인증 상태 변경 리스너
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user || null);
-        setIsLoading(false);
+    const { data: { subscription } } = authApi.onAuthStateChange(
+      async (_event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
       }
     );
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [setUser, setLoading]);
+
+  const signIn = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      const data = await authApi.signIn({ email, password });
+      setUser(data.user);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const signOut = async () => {
+    setLoading(true);
     try {
       await authApi.signOut();
       setUser(null);
-    } catch (error) {
-      console.error("Sign out error:", error);
-      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   return {
     user,
     isLoading,
-    isAuthenticated: !!user,
+    signIn,
     signOut,
   };
 } 

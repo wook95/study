@@ -10,7 +10,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -82,7 +82,7 @@ export default function ProfilePage() {
       });
 
       // 비밀번호 변경 후 로그아웃
-      await logout();
+      await signOut();
       navigate("/login");
     } catch (error: any) {
       toast({

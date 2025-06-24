@@ -28,11 +28,9 @@ interface StudyFormData {
 }
 
 interface FormErrors {
-  name?: string;
-  startDate?: string;
-  endDate?: string;
+  title?: string;
+  description?: string;
   dailyGoalHours?: string;
-  category?: string;
 }
 
 export default function CreateStudyModal({
@@ -84,31 +82,31 @@ export default function CreateStudyModal({
 
   // 폼 유효성 검사
   const validateForm = (): boolean => {
-    const newErrors: Partial<StudyFormData> = {};
+    const newErrors: FormErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "스터디 이름을 입력해주세요.";
+      newErrors.title = "제목을 입력해주세요";
     }
 
     if (!formData.startDate) {
-      newErrors.startDate = "시작일을 선택해주세요.";
+      newErrors.description = "시작일을 선택해주세요.";
     }
 
     if (!formData.endDate) {
-      newErrors.endDate = "종료일을 선택해주세요.";
+      newErrors.description = "종료일을 선택해주세요.";
     }
 
     if (formData.startDate && formData.endDate) {
       const start = new Date(formData.startDate);
       const end = new Date(formData.endDate);
       if (end <= start) {
-        newErrors.endDate = "종료일은 시작일보다 늦어야 합니다.";
+        newErrors.description = "종료일은 시작일보다 늦어야 합니다.";
       }
     }
 
     if (
       typeof formData.dailyGoalHours === "number" &&
-      (formData.dailyGoalHours <= 0 || formData.dailyGoalHours > 24)
+      (formData.dailyGoalHours < 1 || formData.dailyGoalHours > 24)
     ) {
       newErrors.dailyGoalHours = "목표 시간은 1-24시간 사이여야 합니다.";
     }
@@ -186,10 +184,10 @@ export default function CreateStudyModal({
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 placeholder="예: 토익 900점 도전, 리액트 마스터하기"
-                className={errors.name ? "border-destructive" : ""}
+                className={errors.title ? "border-destructive" : ""}
               />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name}</p>
+              {errors.title && (
+                <p className="text-sm text-destructive">{errors.title}</p>
               )}
             </div>
 
@@ -207,10 +205,12 @@ export default function CreateStudyModal({
                   onChange={(e) =>
                     handleInputChange("startDate", e.target.value)
                   }
-                  className={errors.startDate ? "border-destructive" : ""}
+                  className={errors.description ? "border-destructive" : ""}
                 />
-                {errors.startDate && (
-                  <p className="text-sm text-destructive">{errors.startDate}</p>
+                {errors.description && (
+                  <p className="text-sm text-destructive">
+                    {errors.description}
+                  </p>
                 )}
               </div>
 
@@ -224,10 +224,12 @@ export default function CreateStudyModal({
                   type="date"
                   value={formData.endDate}
                   onChange={(e) => handleInputChange("endDate", e.target.value)}
-                  className={errors.endDate ? "border-destructive" : ""}
+                  className={errors.description ? "border-destructive" : ""}
                 />
-                {errors.endDate && (
-                  <p className="text-sm text-destructive">{errors.endDate}</p>
+                {errors.description && (
+                  <p className="text-sm text-destructive">
+                    {errors.description}
+                  </p>
                 )}
               </div>
             </div>

@@ -23,11 +23,14 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
   const currentStudyId = selectedStudyId || defaultStudyId;
 
   // 오늘의 투두 목록 조회
-  const { data: todos, isLoading } = useQuery({
+  const { data: todos = [], isLoading } = useQuery({
     queryKey: ["todayTodos", currentStudyId],
     queryFn: () =>
       currentStudyId
-        ? api.todos.getTodaysTodos(currentStudyId)
+        ? api.todos.getTodosByDate(
+            new Date().toISOString().split("T")[0],
+            currentStudyId
+          )
         : Promise.resolve([]),
     enabled: !!currentStudyId,
   });
@@ -66,12 +69,10 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
 
   // 투두 토글 mutation
   const toggleTodoMutation = useMutation({
-    mutationFn: ({ id, isCompleted }: { id: string; isCompleted: boolean }) =>
-      api.todos.toggleTodo(id, isCompleted),
+    mutationFn: (id: string) => api.todos.toggleTodo(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["todayTodos", currentStudyId],
-      });
+      queryClient.invalidateQueries({ queryKey: ["todayTodos"] });
+      queryClient.invalidateQueries({ queryKey: ["calendar"] });
     },
   });
 
@@ -95,7 +96,7 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
   };
 
   const handleToggleTodo = (id: string, currentStatus: boolean) => {
-    toggleTodoMutation.mutate({ id, isCompleted: !currentStatus });
+    toggleTodoMutation.mutate(id);
   };
 
   const handleDeleteTodo = (id: string) => {
@@ -164,10 +165,10 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
           </div>
         ) : todos && todos.length > 0 ? (
           <div className="space-y-2">
-            {todos.map((todo) => (
+            {todos.map((todo: any) => (
               <div
                 key={todo.id}
-                className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                className="group flex items-start space-x-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
               >
                 <button
                   type="button"
@@ -220,8 +221,8 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">진행 상황</span>
               <span className="font-medium">
-                {todos.filter((t) => t.is_completed).length} / {todos.length}{" "}
-                완료
+                완료: {todos.filter((t: any) => t.is_completed).length} /{" "}
+                {todos.length}{" "}
               </span>
             </div>
           </div>

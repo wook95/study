@@ -80,14 +80,10 @@ export default function DayDetailModal({
 
   // 투두 토글 mutation
   const toggleTodoMutation = useMutation({
-    mutationFn: ({ id, isCompleted }: { id: string; isCompleted: boolean }) =>
-      api.todos.toggleTodo(id, isCompleted),
+    mutationFn: (id: string) => api.todos.toggleTodo(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["dayTodos", studyId, dateStr],
-      });
-      queryClient.invalidateQueries({ queryKey: ["monthlyTodos"] });
-      queryClient.invalidateQueries({ queryKey: ["todayTodos"] });
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.invalidateQueries({ queryKey: ["calendar"] });
     },
   });
 
@@ -112,8 +108,8 @@ export default function DayDetailModal({
     addTodoMutation.mutate(newTodoText.trim());
   };
 
-  const handleToggleTodo = (id: string, currentStatus: boolean) => {
-    toggleTodoMutation.mutate({ id, isCompleted: !currentStatus });
+  const handleToggleTodo = (id: string) => {
+    toggleTodoMutation.mutate(id);
   };
 
   const handleDeleteTodo = (id: string) => {
@@ -180,7 +176,7 @@ export default function DayDetailModal({
                 >
                   <button
                     type="button"
-                    onClick={() => handleToggleTodo(todo.id, todo.is_completed)}
+                    onClick={() => handleToggleTodo(todo.id)}
                     disabled={toggleTodoMutation.isPending}
                     className="text-primary hover:text-primary/80"
                   >
