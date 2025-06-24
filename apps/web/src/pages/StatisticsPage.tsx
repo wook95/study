@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Calendar, Target, TrendingUp } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MonthlyStats from "../components/MonthlyStats";
 import ProgressChart from "../components/ProgressChart";
 import StreakCounter from "../components/StreakCounter";
@@ -31,9 +31,12 @@ export default function StatisticsPage() {
   const currentStudy =
     studies?.find((study) => study.id === selectedStudyId) || studies?.[0];
 
-  if (currentStudy && selectedStudyId !== currentStudy.id) {
-    setSelectedStudyId(currentStudy.id);
-  }
+  // useEffect로 스터디 자동 선택 처리
+  useEffect(() => {
+    if (currentStudy && selectedStudyId !== currentStudy.id) {
+      setSelectedStudyId(currentStudy.id);
+    }
+  }, [currentStudy, selectedStudyId]);
 
   if (!studies || studies.length === 0) {
     return (

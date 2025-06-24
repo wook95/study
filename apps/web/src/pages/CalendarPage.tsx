@@ -47,7 +47,7 @@ export default function CalendarPage() {
     queryKey: ["monthlyTodos", currentStudyId, currentYear, currentMonth],
     queryFn: () =>
       currentStudyId
-        ? api.todos.getTodosByDateRange(currentStudyId, startDate, endDate)
+        ? api.todos.getTodosByDateRange(startDate, endDate, currentStudyId)
         : Promise.resolve([]),
     enabled: !!currentStudyId,
   });

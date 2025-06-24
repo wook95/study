@@ -43,7 +43,7 @@ export default function DayDetailModal({
   // 해당 날짜의 투두 목록 조회
   const { data: todos, isLoading } = useQuery({
     queryKey: ["dayTodos", studyId, dateStr],
-    queryFn: () => api.todos.getTodosByDate(studyId, dateStr),
+    queryFn: () => api.todos.getTodosByDate(dateStr, studyId),
     enabled: isOpen && !!studyId,
   });
 
