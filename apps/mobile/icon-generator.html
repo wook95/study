@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .preview { margin: 20px 0; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        button { padding: 10px 20px; margin: 5px; background: #007AFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .downloads { margin-top: 20px; }
+        .downloads a { display: block; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>📱 스터디 완주 아이콘 생성기</h1>
+    
+    <div class="preview">
+        <h3>원본 SVG 미리보기:</h3>
+        <div id="svg-container"><svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 배경 그라데이션 -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 책 그라데이션 -->
+    <linearGradient id="bookGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f8f9fa;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <!-- 체크마크 그라데이션 -->
+    <linearGradient id="checkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ade80;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- 그림자 필터 -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  
+  <!-- 배경 원형 -->
+  <circle cx="512" cy="512" r="480" fill="url(#bgGradient)" />
+  
+  <!-- 책 아이콘 -->
+  <g transform="translate(256, 280)" filter="url(#shadow)">
+    <!-- 책 뒷면 -->
+    <rect x="20" y="20" width="480" height="360" rx="24" ry="24" fill="url(#bookGradient)" opacity="0.8" />
+    
+    <!-- 책 앞면 -->
+    <rect x="0" y="0" width="480" height="360" rx="24" ry="24" fill="url(#bookGradient)" stroke="#e5e7eb" stroke-width="4" />
+    
+    <!-- 책 페이지 -->
+    <rect x="40" y="40" width="400" height="8" rx="4" ry="4" fill="#6b7280" opacity="0.3" />
+    <rect x="40" y="70" width="320" height="8" rx="4" ry="4" fill="#6b7280" opacity="0.3" />
+    <rect x="40" y="100" width="360" height="8" rx="4" ry="4" fill="#6b7280" opacity="0.3" />
+    <rect x="40" y="130" width="280" height="8" rx="4" ry="4" fill="#6b7280" opacity="0.3" />
+    <rect x="40" y="160" width="340" height="8" rx="4" ry="4" fill="#6b7280" opacity="0.3" />
+    
+    <!-- 책 제목 영역 -->
+    <rect x="40" y="220" width="400" height="100" rx="8" ry="8" fill="#667eea" opacity="0.1" />
+    <text x="240" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="#667eea">STUDY</text>
+  </g>
+  
+  <!-- 체크마크 아이콘 (우하단) -->
+  <g transform="translate(640, 640)">
+    <!-- 체크마크 배경 원 -->
+    <circle cx="80" cy="80" r="72" fill="url(#checkGradient)" filter="url(#shadow)" />
+    
+    <!-- 체크마크 -->
+    <path d="M 40 80 L 70 110 L 120 50" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+  
+  <!-- 진행 표시 점들 -->
+  <g opacity="0.6">
+    <circle cx="200" cy="800" r="12" fill="#ffffff" />
+    <circle cx="240" cy="800" r="12" fill="#ffffff" />
+    <circle cx="280" cy="800" r="12" fill="#ffffff" />
+    <circle cx="320" cy="800" r="8" fill="#ffffff" opacity="0.5" />
+    <circle cx="360" cy="800" r="8" fill="#ffffff" opacity="0.3" />
+  </g>
+</svg> </div>
+    </div>
+    
+    <div>
+        <h3>PNG 아이콘 생성:</h3>
+        <button onclick="generateIcons()">🎨 모든 아이콘 생성</button>
+        <button onclick="generateSplash()">🌟 스플래시 생성</button>
+    </div>
+    
+    <div class="downloads" id="downloads">
+        <h3>다운로드:</h3>
+    </div>
+    
+    <script>
+        // SVG를 PNG로 변환하는 함수
+        function svgToPng(svgElement, width, height, callback) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = width;
+            canvas.height = height;
+            
+            const svgString = new XMLSerializer().serializeToString(svgElement);
+            const img = new Image();
+            
+            img.onload = function() {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob(callback, 'image/png');
+            };
+            
+            const blob = new Blob([svgString], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        }
+        
+        // 아이콘 생성 함수
+        function generateIcons() {
+            const svgElement = document.querySelector('#svg-container svg');
+            const downloads = document.getElementById('downloads');
+            
+            const sizes = [
+                { name: 'icon.png', size: 1024 },
+                { name: 'adaptive-icon.png', size: 1024 },
+                { name: 'favicon.png', size: 48 }
+            ];
+            
+            sizes.forEach(({name, size}) => {
+                svgToPng(svgElement, size, size, (blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = name;
+                    a.textContent = `📱 다운로드: ${name} (${size}x${size})`;
+                    a.style.display = 'block';
+                    a.style.margin = '5px 0';
+                    downloads.appendChild(a);
+                });
+            });
+        }
+        
+        // 스플래시 스크린 생성 함수
+        function generateSplash() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 1284;
+            canvas.height = 2778;
+            
+            // 배경 그라데이션
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 중앙에 아이콘 배치
+            const svgElement = document.querySelector('#svg-container svg');
+            const iconSize = 300;
+            
+            svgToPng(svgElement, iconSize, iconSize, (blob) => {
+                const img = new Image();
+                img.onload = function() {
+                    const x = (canvas.width - iconSize) / 2;
+                    const y = (canvas.height - iconSize) / 2 - 100;
+                    
+                    ctx.drawImage(img, x, y, iconSize, iconSize);
+                    
+                    // 앱 이름 텍스트
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 48px Arial, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('스터디 완주', canvas.width / 2, y + iconSize + 80);
+                    
+                    ctx.font = '24px Arial, sans-serif';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.fillText('Study Completion Companion', canvas.width / 2, y + iconSize + 120);
+                    
+                    canvas.toBlob((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'splash-icon.png';
+                        a.textContent = '🌟 다운로드: splash-icon.png (1284x2778)';
+                        a.style.display = 'block';
+                        a.style.margin = '5px 0';
+                        document.getElementById('downloads').appendChild(a);
+                    }, 'image/png');
+                };
+                
+                const url = URL.createObjectURL(blob);
+                img.src = url;
+            });
+        }
+        
+        // SVG 스타일 조정
+        document.addEventListener('DOMContentLoaded', function() {
+            const svg = document.querySelector('#svg-container svg');
+            if (svg) {
+                svg.style.width = '300px';
+                svg.style.height = '300px';
+                svg.style.border = '1px solid #ccc';
+            }
+        });
+    </script>
+</body>
+</html>
