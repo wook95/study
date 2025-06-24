@@ -135,10 +135,13 @@
 - [x] Android 네트워크 보안 설정
 - [x] 앱 설정 및 README 작성
 
-### Phase 8: 네이티브 기능 연동 🚧
+### Phase 8: 네이티브 기능 연동 ✅
 
-- [ ] React Native 로컬 푸시 알림 구현
-- [ ] 알림 권한 요청 및 스케줄링
+- [x] React Native 로컬 푸시 알림 구현
+- [x] 알림 권한 요청 및 스케줄링
+- [x] 매일 밤 10시 스터디 알림 설정
+- [x] NotificationService 클래스 구현
+- [x] 개발용 알림 테스트 UI 구현
 - [ ] 앱 아이콘 및 스플래시 스크린 설정
 - [ ] 네이티브 스토리지 연동 (AsyncStorage)
 - [ ] 앱 상태 관리 (foreground/background)

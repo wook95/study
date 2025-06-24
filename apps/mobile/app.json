@@ -14,7 +14,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.studyeungwondan.app"
+      "bundleIdentifier": "com.studyeungwondan.app",
+      "infoPlist": {
+        "UIBackgroundModes": ["background-processing"],
+        "NSUserNotificationsUsageDescription": "스터디 시간 알림을 위해 알림 권한이 필요합니다."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -23,7 +27,13 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.studyeungwondan.app",
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "NOTIFICATIONS",
+        "SCHEDULE_EXACT_ALARM",
+        "VIBRATE",
+        "WAKE_LOCK"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,6 +43,14 @@
         "expo-screen-orientation",
         {
           "initialOrientation": "PORTRAIT_UP"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "스터디 알림"
         }
       ]
     ]

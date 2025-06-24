@@ -9,6 +9,8 @@ import {
   StyleSheet,
 } from "react-native";
 import { WebView } from "react-native-webview";
+import { NotificationTest } from "./src/components/NotificationTest";
+import { NotificationService } from "./src/services/NotificationService";
 
 export default function App() {
   const [canGoBack, setCanGoBack] = useState(false);
@@ -18,6 +20,29 @@ export default function App() {
   const WEB_APP_URL = __DEV__
     ? "http://localhost:5173"
     : "https://your-domain.com"; // TODO: 실제 배포 도메인으로 변경
+
+  // 알림 서비스 초기화
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      const notificationService = NotificationService.getInstance();
+
+      // Android 알림 채널 설정
+      await notificationService.setupAndroidChannel();
+
+      // 알림 권한 요청
+      const hasPermission = await notificationService.requestPermissions();
+
+      if (hasPermission) {
+        // 밤 10시 스터디 알림 스케줄
+        await notificationService.scheduleStudyReminder();
+        console.log("📱 스터디 알림이 설정되었습니다!");
+      } else {
+        console.log("📱 알림 권한이 필요합니다.");
+      }
+    };
+
+    initializeNotifications();
+  }, []);
 
   // Android 백 버튼 처리
   useEffect(() => {
@@ -73,6 +98,9 @@ export default function App() {
         // Pull to refresh 활성화
         pullToRefreshEnabled={true}
       />
+
+      {/* 개발 환경에서만 표시되는 알림 테스트 UI */}
+      <NotificationTest />
     </SafeAreaView>
   );
 }
