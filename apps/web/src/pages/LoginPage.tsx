@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Eye, EyeOff, LogIn, User } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -26,6 +26,22 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // 리다이렉트할 경로 (이전 페이지 또는 홈)
+  const from = (location.state as any)?.from || "/";
+  const message = (location.state as any)?.message;
+
+  // 페이지 진입 시 메시지 표시
+  useEffect(() => {
+    if (message) {
+      toast({
+        title: "인증 필요",
+        description: message,
+        variant: "destructive",
+      });
+    }
+  }, [message, toast]);
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginData) => authApi.signIn(data),
@@ -35,7 +51,8 @@ export default function LoginPage() {
           title: "로그인 성공",
           description: "스터디 완주에 오신 것을 환영합니다!",
         });
-        navigate("/");
+        // 이전 페이지로 리다이렉트
+        navigate(from, { replace: true });
       }
     },
     onError: (error: Error) => {
@@ -69,6 +86,12 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl font-bold">로그인</CardTitle>
           <CardDescription>스터디 완주 계정으로 로그인하세요</CardDescription>
+          {from !== "/" && (
+            <p className="text-sm text-muted-foreground mt-2">
+              로그인 후 <span className="font-medium">{from}</span> 페이지로
+              이동합니다
+            </p>
+          )}
         </CardHeader>
 
         <CardContent>

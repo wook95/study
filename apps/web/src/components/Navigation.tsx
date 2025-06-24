@@ -7,10 +7,9 @@ import {
   LogOut,
   User,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "../hooks/use-toast";
-import { authApi, supabase } from "../lib/supabase";
+import { useAuth } from "../hooks/useAuth";
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 
@@ -18,8 +17,7 @@ export default function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoading, signOut } = useAuth();
 
   const navItems = [
     { href: "/", label: "홈", icon: Home },
@@ -27,36 +25,9 @@ export default function Navigation() {
     { href: "/statistics", label: "통계", icon: BarChart3 },
   ];
 
-  // 인증 상태 확인
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data } = await authApi.getSession();
-        setUser(data?.session?.user || null);
-      } catch (error) {
-        console.error("Auth check error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-
-    // 인증 상태 변경 리스너
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user || null);
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleLogout = async () => {
     try {
-      await authApi.signOut();
-      setUser(null);
+      await signOut();
       toast({
         title: "로그아웃 완료",
         description: "성공적으로 로그아웃되었습니다.",

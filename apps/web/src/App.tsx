@@ -2,10 +2,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import Navigation from "./components/Navigation";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { Toaster } from "./components/ui/toaster";
 import CalendarPage from "./pages/CalendarPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import SignupPage from "./pages/SignupPage";
 import StatisticsPage from "./pages/StatisticsPage";
 import StudyPage from "./pages/StudyPage";
@@ -33,10 +35,41 @@ function App() {
               <Route path="/signup" element={<SignupPage />} />
 
               {/* 보호된 페이지들 - 로그인 필요 */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/study/:studyId" element={<StudyPage />} />
-              <Route path="/calendar" element={<CalendarPage />} />
-              <Route path="/statistics" element={<StatisticsPage />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/study/:studyId"
+                element={
+                  <ProtectedRoute>
+                    <StudyPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/calendar"
+                element={
+                  <ProtectedRoute>
+                    <CalendarPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/statistics"
+                element={
+                  <ProtectedRoute>
+                    <StatisticsPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* 404 페이지 - catch all */}
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>
           <Toaster />
