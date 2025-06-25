@@ -31,7 +31,7 @@ export default function HomePage() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
           <p className="text-muted-foreground">스터디 목록을 불러오는 중...</p>
         </div>
       </div>
@@ -63,47 +63,55 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         {/* PWA 설치 버튼 */}
         <PWAInstallButton />
 
         {/* 헤더 */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
               스터디 대시보드
             </h1>
             <p className="text-muted-foreground">
               오늘도 화이팅! 💪 꾸준함이 실력이 됩니다.
             </p>
           </div>
-          <Button onClick={() => setShowCreateModal(true)}>
+          <Button
+            onClick={() => setShowCreateModal(true)}
+            className="w-full md:w-auto"
+          >
             <Plus className="mr-2 h-4 w-4" />새 스터디
           </Button>
         </div>
 
         {/* 메인 콘텐츠 */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 md:gap-6 lg:grid-cols-2">
           {/* 진행 중인 스터디 */}
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">진행 중인 스터디</h2>
+            <h2 className="text-lg md:text-xl font-semibold">
+              진행 중인 스터디
+            </h2>
             {studies && studies.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 md:space-y-4">
                 {studies.map((study) => (
                   <StudyCard key={study.id} study={study} />
                 ))}
               </div>
             ) : (
               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <div className="text-6xl mb-4">📚</div>
-                  <h3 className="text-lg font-medium mb-2">
+                <CardContent className="flex flex-col items-center justify-center py-8 md:py-12">
+                  <div className="text-4xl md:text-6xl mb-4">📚</div>
+                  <h3 className="text-base md:text-lg font-medium mb-2">
                     진행 중인 스터디가 없습니다
                   </h3>
-                  <p className="text-muted-foreground text-center mb-4">
+                  <p className="text-muted-foreground text-center mb-4 text-sm md:text-base">
                     새로운 스터디를 시작해서 목표를 달성해보세요!
                   </p>
-                  <Button onClick={() => setShowCreateModal(true)}>
+                  <Button
+                    onClick={() => setShowCreateModal(true)}
+                    className="w-full md:w-auto"
+                  >
                     <Plus className="mr-2 h-4 w-4" />첫 스터디 만들기
                   </Button>
                 </CardContent>
@@ -113,7 +121,7 @@ export default function HomePage() {
 
           {/* 오늘의 할일 */}
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">오늘의 할일</h2>
+            <h2 className="text-lg md:text-xl font-semibold">오늘의 할일</h2>
             <TodayTodos studies={studies || []} />
           </div>
         </div>

@@ -72,7 +72,7 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
     mutationFn: (id: string) => api.todos.toggleTodo(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["todayTodos"] });
-      queryClient.invalidateQueries({ queryKey: ["calendar"] });
+      queryClient.invalidateQueries({ queryKey: ["monthlyTodos"] });
     },
   });
 
@@ -122,20 +122,22 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>오늘의 할일</CardTitle>
+      <CardHeader className="pb-3 md:pb-6">
+        <CardTitle className="text-lg md:text-xl">오늘의 할일</CardTitle>
         {studies.length > 1 && (
-          <select
-            value={currentStudyId}
-            onChange={(e) => setSelectedStudyId(e.target.value)}
-            className="w-full p-2 border rounded-md bg-background"
-          >
-            {studies.map((study) => (
-              <option key={study.id} value={study.id}>
-                {study.name}
-              </option>
-            ))}
-          </select>
+          <div className="mt-3">
+            <select
+              value={currentStudyId}
+              onChange={(e) => setSelectedStudyId(e.target.value)}
+              className="w-full p-2 md:p-3 border rounded-md bg-background text-sm md:text-base font-medium focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {studies.map((study) => (
+                <option key={study.id} value={study.id}>
+                  {study.name}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
       </CardHeader>
 
@@ -148,11 +150,13 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
             onChange={(e) => setNewTodoText(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleAddTodo()}
             disabled={addTodoMutation.isPending}
+            className="text-base md:text-sm"
           />
           <Button
             onClick={handleAddTodo}
             disabled={!newTodoText.trim() || addTodoMutation.isPending}
             size="sm"
+            className="h-10 w-10 md:h-9 md:w-9 p-0 flex-shrink-0"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -168,23 +172,23 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
             {todos.map((todo: any) => (
               <div
                 key={todo.id}
-                className="group flex items-start space-x-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                className="group flex items-start space-x-3 p-3 md:p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
               >
                 <button
                   type="button"
                   onClick={() => handleToggleTodo(todo.id, todo.is_completed)}
                   disabled={toggleTodoMutation.isPending}
-                  className="text-primary hover:text-primary/80"
+                  className="text-primary hover:text-primary/80 flex-shrink-0 touch-manipulation"
                 >
                   {todo.is_completed ? (
-                    <CheckCircle className="h-5 w-5" />
+                    <CheckCircle className="h-5 w-5 md:h-6 md:w-6" />
                   ) : (
-                    <Circle className="h-5 w-5" />
+                    <Circle className="h-5 w-5 md:h-6 md:w-6" />
                   )}
                 </button>
 
                 <span
-                  className={`flex-1 ${
+                  className={`flex-1 text-sm md:text-base leading-relaxed ${
                     todo.is_completed
                       ? "line-through text-muted-foreground"
                       : "text-foreground"
@@ -197,7 +201,7 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
                   type="button"
                   onClick={() => handleDeleteTodo(todo.id)}
                   disabled={deleteTodoMutation.isPending}
-                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  className="text-muted-foreground hover:text-destructive transition-colors flex-shrink-0 p-1 touch-manipulation"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -207,7 +211,7 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
         ) : (
           <div className="text-center py-8">
             <div className="text-4xl mb-4">🎯</div>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm md:text-base">
               오늘의 할일이 없습니다.
               <br />
               새로운 목표를 추가해보세요!
@@ -218,11 +222,20 @@ export default function TodayTodos({ studies }: TodayTodosProps) {
         {/* 진행 상황 요약 */}
         {todos && todos.length > 0 && (
           <div className="pt-4 border-t">
-            <div className="flex justify-between text-sm">
+            <div className="flex flex-col md:flex-row md:justify-between text-sm gap-1 md:gap-0">
               <span className="text-muted-foreground">진행 상황</span>
               <span className="font-medium">
                 완료: {todos.filter((t: any) => t.is_completed).length} /{" "}
                 {todos.length}{" "}
+                <span className="text-blue-600">
+                  (
+                  {Math.round(
+                    (todos.filter((t: any) => t.is_completed).length /
+                      todos.length) *
+                      100
+                  )}
+                  %)
+                </span>
               </span>
             </div>
           </div>

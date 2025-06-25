@@ -32,7 +32,7 @@ function App() {
       <Router>
         <div className="min-h-screen bg-background">
           <Navigation />
-          <main className="container mx-auto px-4 py-6">
+          <main className="container mx-auto px-3 md:px-4 py-4 md:py-6">
             <Routes>
               {/* 공개 페이지 */}
               <Route path="/login" element={<LoginPage />} />

@@ -55,11 +55,11 @@ export default function StudyCalendar({
 
     if (completedCount === totalCount) {
       return "completed"; // 완료
-    } else if (completedCount > 0) {
-      return "partial"; // 일부 완료
-    } else {
-      return "incomplete"; // 미완료
     }
+    if (completedCount > 0) {
+      return "partial"; // 일부 완료
+    }
+    return "incomplete"; // 미완료
   };
 
   // 날짜가 스터디 기간 내에 있는지 확인
@@ -102,7 +102,7 @@ export default function StudyCalendar({
           <div
             key={day}
             className={cn(
-              "p-2 text-center text-sm font-medium",
+              "p-1 md:p-2 text-center text-xs md:text-sm font-medium",
               index === 0 ? "text-red-500" : "text-muted-foreground"
             )}
           >
@@ -121,17 +121,17 @@ export default function StudyCalendar({
 
           return (
             <button
-              key={index}
+              key={`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`}
               type="button"
               onClick={() => onDateSelect(date)}
               disabled={!inStudyPeriod || !currentMonth}
               className={cn(
-                "relative aspect-square p-1 text-sm border rounded-lg transition-colors",
-                "hover:bg-accent hover:border-accent-foreground",
+                "relative aspect-square p-1 text-xs md:text-sm border rounded-lg transition-colors min-h-[44px] md:min-h-[48px]",
+                "hover:bg-accent hover:border-accent-foreground active:scale-95 touch-manipulation",
                 currentMonth
                   ? "bg-background border-border"
                   : "bg-muted/50 border-muted text-muted-foreground",
-                today && "ring-2 ring-primary ring-offset-2",
+                today && "ring-2 ring-primary ring-offset-1 md:ring-offset-2",
                 inStudyPeriod && currentMonth
                   ? "cursor-pointer"
                   : "cursor-not-allowed opacity-50"
@@ -153,7 +153,7 @@ export default function StudyCalendar({
               {inStudyPeriod && currentMonth && status !== "none" && (
                 <div
                   className={cn(
-                    "absolute bottom-1 right-1 w-2 h-2 rounded-full",
+                    "absolute bottom-1 right-1 w-1.5 h-1.5 md:w-2 md:h-2 rounded-full",
                     getStatusColor(status)
                   )}
                 />
@@ -171,7 +171,7 @@ export default function StudyCalendar({
 
                   if (todoCount > 0) {
                     return (
-                      <div className="absolute top-1 right-1 text-xs text-muted-foreground">
+                      <div className="absolute top-0.5 right-0.5 md:top-1 md:right-1 text-[10px] md:text-xs text-muted-foreground bg-background/80 rounded-full min-w-[14px] md:min-w-[16px] h-[14px] md:h-[16px] flex items-center justify-center">
                         {todoCount}
                       </div>
                     );
@@ -184,8 +184,8 @@ export default function StudyCalendar({
       </div>
 
       {/* 캘린더 하단 요약 정보 */}
-      <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div className="mt-4 p-3 md:p-4 bg-muted/50 rounded-lg">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 text-xs md:text-sm">
           {(() => {
             const monthTodos = todos.filter((todo) => {
               const todoDate = new Date(todo.date);
@@ -204,21 +204,25 @@ export default function StudyCalendar({
             return (
               <>
                 <div className="text-center">
-                  <div className="font-semibold text-lg">{totalTodos}</div>
+                  <div className="font-semibold text-base md:text-lg">
+                    {totalTodos}
+                  </div>
                   <div className="text-muted-foreground">총 할일</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-lg text-green-600">
+                  <div className="font-semibold text-base md:text-lg text-green-600">
                     {completedTodos}
                   </div>
                   <div className="text-muted-foreground">완료</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-lg">{uniqueDays}</div>
+                  <div className="font-semibold text-base md:text-lg">
+                    {uniqueDays}
+                  </div>
                   <div className="text-muted-foreground">활동 일수</div>
                 </div>
                 <div className="text-center">
-                  <div className="font-semibold text-lg text-blue-600">
+                  <div className="font-semibold text-base md:text-lg text-blue-600">
                     {totalTodos > 0
                       ? Math.round((completedTodos / totalTodos) * 100)
                       : 0}
