@@ -1,7 +1,7 @@
 {
-  "name": "스터디 완주",
-  "short_name": "스터디완주",
-  "description": "매일 꾸준한 독서 습관을 만들어주는 스터디 완주 앱",
+  "name": "스터디 응원단",
+  "short_name": "스터디응원단",
+  "description": "매일 꾸준한 스터디 습관을 만들어주는 스터디 완주 앱",
   "version": "1.0.0",
   "start_url": "/",
   "display": "standalone",

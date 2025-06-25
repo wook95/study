@@ -102,6 +102,10 @@ class NotificationService {
     // 기존 스케줄 제거
     this.clearAllSchedules();
 
+    // 설정된 시간을 로컬 스토리지에 저장
+    const scheduleInfo = { hour, minute, enabled: true };
+    localStorage.setItem('notificationScheduleInfo', JSON.stringify(scheduleInfo));
+
     const scheduleNotification = () => {
       const now = new Date();
       const scheduledTime = new Date();
@@ -116,8 +120,16 @@ class NotificationService {
 
       const timeoutId = setTimeout(async () => {
         await this.showNotification('📚 스터디 시간입니다!', {
-          body: '책을 읽고 오늘의 투두를 완료해보세요!',
-          tag: 'daily-study-reminder'
+          body: `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} 스터디 시간! 책을 읽고 오늘의 투두를 완료해보세요!`,
+          tag: 'daily-study-reminder',
+          icon: '/icon-192x192.png',
+          badge: '/icon-96x96.png',
+          requireInteraction: true,
+          data: {
+            type: 'daily-reminder',
+            time: `${hour}:${minute}`,
+            timestamp: Date.now()
+          }
         });
 
         // 다음 날 알림 다시 스케줄
@@ -141,7 +153,36 @@ class NotificationService {
     if (scheduleId) {
       clearTimeout(Number(scheduleId));
       localStorage.removeItem('notificationScheduleId');
+      localStorage.removeItem('notificationScheduleInfo');
       console.log('[NotificationService] Cleared existing notification schedule');
+    }
+  }
+
+  /**
+   * 저장된 스케줄 정보 가져오기
+   */
+  getSavedScheduleInfo() {
+    try {
+      const saved = localStorage.getItem('notificationScheduleInfo');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error parsing saved schedule info:', error);
+    }
+    return { hour: 22, minute: 0, enabled: false };
+  }
+
+  /**
+   * 저장된 스케줄이 있으면 자동으로 재설정
+   */
+  restoreScheduleIfExists() {
+    const scheduleInfo = this.getSavedScheduleInfo();
+    const hasActiveSchedule = !!localStorage.getItem('notificationScheduleId');
+    
+    if (scheduleInfo.enabled && !hasActiveSchedule) {
+      console.log('[NotificationService] Restoring saved schedule:', scheduleInfo);
+      this.scheduleDaily(scheduleInfo.hour, scheduleInfo.minute);
     }
   }
 
@@ -149,10 +190,47 @@ class NotificationService {
    * 테스트용 즉시 알림
    */
   async testNotification() {
-    await this.showNotification('🧪 테스트 알림', {
-      body: '알림이 정상적으로 작동합니다!',
-      tag: 'test-notification'
-    });
+    console.log('[NotificationService] Starting test notification...');
+    
+    // 권한 확인 및 요청
+    const permission = await this.requestPermission();
+    if (permission !== 'granted') {
+      console.error('[NotificationService] Permission not granted for test notification');
+      throw new Error('알림 권한이 필요합니다. 브라우저에서 알림을 허용해주세요.');
+    }
+
+    // Service Worker 준비 대기 (최대 5초)
+    let attempts = 0;
+    while (!this.registration && attempts < 10) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      attempts++;
+      if ('serviceWorker' in navigator) {
+        try {
+          this.registration = await navigator.serviceWorker.ready;
+        } catch (e) {
+          // 무시하고 계속
+        }
+      }
+    }
+
+    try {
+      await this.showNotification('🧪 테스트 알림', {
+        body: '알림이 정상적으로 작동합니다! 스터디 응원단이 함께 합니다 📚',
+        tag: 'test-notification',
+        icon: '/icon-192x192.png',
+        badge: '/icon-96x96.png',
+        requireInteraction: false, // 자동으로 사라지도록
+        data: {
+          type: 'test',
+          timestamp: Date.now()
+        }
+      });
+      
+      console.log('[NotificationService] Test notification sent successfully');
+    } catch (error) {
+      console.error('[NotificationService] Test notification failed:', error);
+      throw new Error('테스트 알림 전송에 실패했습니다.');
+    }
   }
 
   /**

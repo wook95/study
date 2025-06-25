@@ -1,8 +1,10 @@
-import { Bell, BellOff, TestTube } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Bell, BellOff, Clock, TestTube } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import NotificationService from "../services/NotificationService";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 export default function NotificationTest() {
   const [notificationInfo, setNotificationInfo] = useState({
@@ -12,37 +14,87 @@ export default function NotificationTest() {
     serviceWorkerReady: false,
   });
 
+  const [selectedTime, setSelectedTime] = useState({
+    hour: 22,
+    minute: 0,
+  });
+
+  const [isTestingNotification, setIsTestingNotification] = useState(false);
+
   const notificationService = NotificationService.getInstance();
 
+  const updateNotificationInfo = useCallback(() => {
+    setNotificationInfo(notificationService.getNotificationInfo());
+  }, [notificationService]);
+
   useEffect(() => {
+    // 저장된 스케줄 정보 불러오기
+    const savedSchedule = notificationService.getSavedScheduleInfo();
+    if (savedSchedule.enabled) {
+      setSelectedTime({
+        hour: savedSchedule.hour,
+        minute: savedSchedule.minute,
+      });
+    }
+
     updateNotificationInfo();
 
     // 주기적으로 상태 업데이트
     const interval = setInterval(updateNotificationInfo, 2000);
     return () => clearInterval(interval);
-  }, []);
-
-  const updateNotificationInfo = () => {
-    setNotificationInfo(notificationService.getNotificationInfo());
-  };
+  }, [notificationService, updateNotificationInfo]);
 
   const handleRequestPermission = async () => {
-    await notificationService.requestPermission();
-    updateNotificationInfo();
+    try {
+      await notificationService.requestPermission();
+      updateNotificationInfo();
+    } catch (error) {
+      console.error("권한 요청 실패:", error);
+    }
   };
 
   const handleTestNotification = async () => {
-    await notificationService.testNotification();
+    if (isTestingNotification) return;
+
+    setIsTestingNotification(true);
+    try {
+      await notificationService.testNotification();
+      console.log("테스트 알림 전송 완료");
+    } catch (error) {
+      console.error("테스트 알림 실패:", error);
+    } finally {
+      setTimeout(() => setIsTestingNotification(false), 2000);
+    }
   };
 
   const handleScheduleDaily = () => {
-    notificationService.scheduleDaily(22, 0); // 매일 밤 10시
-    updateNotificationInfo();
+    try {
+      notificationService.scheduleDaily(selectedTime.hour, selectedTime.minute);
+      updateNotificationInfo();
+      console.log(
+        `매일 ${selectedTime.hour}:${selectedTime.minute
+          .toString()
+          .padStart(2, "0")} 알림 설정됨`
+      );
+    } catch (error) {
+      console.error("알림 스케줄 설정 실패:", error);
+    }
   };
 
   const handleClearSchedule = () => {
-    notificationService.clearAllSchedules();
-    updateNotificationInfo();
+    try {
+      notificationService.clearAllSchedules();
+      updateNotificationInfo();
+      console.log("알림 스케줄 제거됨");
+    } catch (error) {
+      console.error("알림 스케줄 제거 실패:", error);
+    }
+  };
+
+  const formatTime = (hour: number, minute: number) => {
+    return `${hour.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   return (
@@ -114,7 +166,7 @@ export default function NotificationTest() {
         </div>
 
         {/* 컨트롤 버튼들 */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {notificationInfo.permission !== "granted" && (
             <Button
               onClick={handleRequestPermission}
@@ -128,32 +180,99 @@ export default function NotificationTest() {
 
           <Button
             onClick={handleTestNotification}
-            className="w-full"
-            disabled={notificationInfo.permission !== "granted"}
+            className="w-full bg-blue-600 hover:bg-blue-700"
+            disabled={
+              notificationInfo.permission !== "granted" || isTestingNotification
+            }
           >
             <TestTube className="h-4 w-4 mr-2" />
-            테스트 알림 보내기
+            {isTestingNotification
+              ? "알림 전송 중..."
+              : "즉시 테스트 알림 보내기"}
           </Button>
 
-          {!notificationInfo.hasSchedule ? (
-            <Button
-              onClick={handleScheduleDaily}
-              className="w-full bg-green-600 hover:bg-green-700"
-              disabled={notificationInfo.permission !== "granted"}
-            >
-              <Bell className="h-4 w-4 mr-2" />
-              매일 밤 10시 알림 설정
-            </Button>
-          ) : (
-            <Button
-              onClick={handleClearSchedule}
-              className="w-full"
-              variant="destructive"
-            >
-              <BellOff className="h-4 w-4 mr-2" />
-              알림 스케줄 제거
-            </Button>
-          )}
+          {/* 시간 선택 섹션 */}
+          <div className="space-y-3 p-3 border rounded-lg bg-gray-50">
+            <Label className="flex items-center gap-2 text-sm font-medium">
+              <Clock className="h-4 w-4" />
+              매일 알림 시간 설정
+            </Label>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="hour" className="text-xs">
+                  시간
+                </Label>
+                <Input
+                  id="hour"
+                  type="number"
+                  min="0"
+                  max="23"
+                  value={selectedTime.hour}
+                  onChange={(e) =>
+                    setSelectedTime((prev) => ({
+                      ...prev,
+                      hour: Math.max(
+                        0,
+                        Math.min(23, Number.parseInt(e.target.value) || 0)
+                      ),
+                    }))
+                  }
+                  className="text-center"
+                />
+              </div>
+              <div>
+                <Label htmlFor="minute" className="text-xs">
+                  분
+                </Label>
+                <Input
+                  id="minute"
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={selectedTime.minute}
+                  onChange={(e) =>
+                    setSelectedTime((prev) => ({
+                      ...prev,
+                      minute: Math.max(
+                        0,
+                        Math.min(59, Number.parseInt(e.target.value) || 0)
+                      ),
+                    }))
+                  }
+                  className="text-center"
+                />
+              </div>
+            </div>
+
+            <div className="text-center text-sm text-gray-600">
+              선택된 시간:{" "}
+              <span className="font-medium">
+                {formatTime(selectedTime.hour, selectedTime.minute)}
+              </span>
+            </div>
+
+            {!notificationInfo.hasSchedule ? (
+              <Button
+                onClick={handleScheduleDaily}
+                className="w-full bg-green-600 hover:bg-green-700"
+                disabled={notificationInfo.permission !== "granted"}
+              >
+                <Bell className="h-4 w-4 mr-2" />
+                매일 {formatTime(selectedTime.hour, selectedTime.minute)} 알림
+                설정
+              </Button>
+            ) : (
+              <Button
+                onClick={handleClearSchedule}
+                className="w-full"
+                variant="destructive"
+              >
+                <BellOff className="h-4 w-4 mr-2" />
+                알림 스케줄 제거
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* 도움말 */}
@@ -161,6 +280,8 @@ export default function NotificationTest() {
           <p className="font-medium mb-1">💡 알림 기능 안내:</p>
           <ul className="space-y-1">
             <li>• 브라우저에서 알림 권한을 허용해주세요</li>
+            <li>• 테스트 알림은 즉시 전송됩니다</li>
+            <li>• 시간을 선택하여 매일 알림을 설정할 수 있습니다</li>
             <li>• iOS Safari는 홈 화면 추가 후 알림 지원</li>
             <li>• 백그라운드에서도 알림이 작동합니다</li>
           </ul>
