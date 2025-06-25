@@ -57,10 +57,13 @@ export default function Navigation() {
       <nav className="border-b bg-card">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center space-x-2">
+            <Link
+              to="/"
+              className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+            >
               <BookOpen className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">스터디 완주</span>
-            </div>
+              <span className="text-xl font-bold">스터디 응원단</span>
+            </Link>
             <div className="text-sm text-muted-foreground">로딩 중...</div>
           </div>
         </div>
@@ -73,10 +76,13 @@ export default function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* 로고 */}
-          <div className="flex items-center space-x-2">
+          <Link
+            to="/"
+            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+          >
             <BookOpen className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">스터디 완주</span>
-          </div>
+            <span className="text-xl font-bold">스터디 응원단</span>
+          </Link>
 
           {/* 데스크톱 네비게이션 */}
           <div className="hidden md:flex items-center space-x-6">
