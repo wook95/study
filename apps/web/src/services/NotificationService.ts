@@ -63,17 +63,6 @@ class NotificationService {
       badge: '/icon-96x96.png',
       tag: 'study-reminder',
       requireInteraction: true,
-      actions: [
-        {
-          action: 'open',
-          title: '앱 열기',
-          icon: '/icon-192x192.png'
-        },
-        {
-          action: 'dismiss',
-          title: '닫기'
-        }
-      ],
       data: {
         url: '/',
         timestamp: Date.now()
@@ -84,9 +73,24 @@ class NotificationService {
 
     if (this.registration) {
       // Service Worker를 통한 알림 (백그라운드에서도 작동)
-      await this.registration.showNotification(title, finalOptions);
+      // Service Worker에서는 actions 지원
+      const swOptions = {
+        ...finalOptions,
+        actions: [
+          {
+            action: 'open',
+            title: '앱 열기',
+            icon: '/icon-192x192.png'
+          },
+          {
+            action: 'dismiss',
+            title: '닫기'
+          }
+        ]
+      };
+      await this.registration.showNotification(title, swOptions);
     } else {
-      // 일반 브라우저 알림
+      // 일반 브라우저 알림 (actions 제외)
       new Notification(title, finalOptions);
     }
   }
@@ -94,7 +98,7 @@ class NotificationService {
   /**
    * 매일 특정 시간에 알림 설정 (WebAPI 기반)
    */
-  scheduleDaily(hour: number = 22, minute: number = 0) {
+  scheduleDaily(hour = 22, minute = 0) {
     // 기존 스케줄 제거
     this.clearAllSchedules();
 
