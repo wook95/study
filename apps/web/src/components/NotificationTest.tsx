@@ -97,6 +97,26 @@ export default function NotificationTest() {
       .padStart(2, "0")}`;
   };
 
+  const handleDiagnoseIssues = async () => {
+    try {
+      const diagnosis = await notificationService.diagnoseNotificationIssues();
+      console.log("[Diagnosis] Notification issues:", diagnosis);
+
+      if (diagnosis.hasIssues) {
+        const issueList = diagnosis.issues.join("\n• ");
+        const recommendationList = diagnosis.recommendations.join("\n• ");
+        alert(
+          `🔍 알림 문제 진단 결과:\n\n📋 발견된 문제:\n• ${issueList}\n\n💡 해결 방법:\n• ${recommendationList}`
+        );
+      } else {
+        alert("✅ 알림 설정에 문제가 없습니다. 다른 원인을 확인해보세요.");
+      }
+    } catch (error) {
+      console.error("[Diagnosis] Failed to diagnose:", error);
+      alert(`진단 중 오류가 발생했습니다: ${error}`);
+    }
+  };
+
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -189,6 +209,53 @@ export default function NotificationTest() {
             {isTestingNotification
               ? "알림 전송 중..."
               : "즉시 테스트 알림 보내기"}
+          </Button>
+
+          {/* 간단한 브라우저 알림 테스트 */}
+          <Button
+            onClick={async () => {
+              try {
+                console.log("[Simple Test] Creating simple notification...");
+                const notification = new Notification("🧪 간단 테스트", {
+                  body: "이 알림이 보이면 브라우저 알림이 정상 작동합니다!",
+                  icon: "/icon-192x192.png",
+                });
+
+                notification.onshow = () => {
+                  console.log("[Simple Test] Notification shown successfully");
+                };
+
+                notification.onerror = (error) => {
+                  console.error("[Simple Test] Notification error:", error);
+                };
+
+                console.log(
+                  "[Simple Test] Simple notification created:",
+                  notification
+                );
+              } catch (error) {
+                console.error(
+                  "[Simple Test] Failed to create notification:",
+                  error
+                );
+                alert(`알림 생성 실패: ${error}`);
+              }
+            }}
+            className="w-full bg-purple-600 hover:bg-purple-700"
+            variant="outline"
+            disabled={notificationInfo.permission !== "granted"}
+          >
+            <TestTube className="h-4 w-4 mr-2" />
+            간단 브라우저 알림 테스트
+          </Button>
+
+          {/* 알림 문제 진단 */}
+          <Button
+            onClick={handleDiagnoseIssues}
+            className="w-full bg-orange-600 hover:bg-orange-700"
+            variant="outline"
+          >
+            🔍 알림 문제 진단하기
           </Button>
 
           {/* 시간 선택 섹션 */}
@@ -285,6 +352,41 @@ export default function NotificationTest() {
             <li>• iOS Safari는 홈 화면 추가 후 알림 지원</li>
             <li>• 백그라운드에서도 알림이 작동합니다</li>
           </ul>
+        </div>
+
+        {/* 크롬 알림 문제 해결 */}
+        <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded border border-blue-200">
+          <p className="font-medium mb-1">🔧 크롬에서 알림이 안 보이나요?</p>
+          <ul className="space-y-1">
+            <li>
+              • 브라우저 설정 → 개인정보 및 보안 → 사이트 설정 → 알림에서
+              허용되어 있는지 확인
+            </li>
+            <li>• 운영체제 알림 설정에서 크롬 알림이 활성화되어 있는지 확인</li>
+            <li>• 방해 금지 모드나 집중 모드가 켜져있지 않은지 확인</li>
+            <li>• F12 → Console에서 알림 관련 에러 메시지 확인</li>
+          </ul>
+          <div className="mt-2 pt-2 border-t border-blue-200">
+            <p className="font-medium">빠른 확인:</p>
+            <p>
+              • 현재 사이트:{" "}
+              <span className="font-mono bg-white px-1 rounded">
+                {window.location.origin}
+              </span>
+            </p>
+            <p>
+              • 알림 권한:{" "}
+              <span className="font-mono bg-white px-1 rounded">
+                {notificationInfo.permission}
+              </span>
+            </p>
+            <p>
+              • Service Worker:{" "}
+              <span className="font-mono bg-white px-1 rounded">
+                {notificationInfo.serviceWorkerReady ? "준비됨" : "로딩중"}
+              </span>
+            </p>
+          </div>
         </div>
       </CardContent>
     </Card>

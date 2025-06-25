@@ -50,10 +50,12 @@ class NotificationService {
    * 즉시 알림 표시
    */
   async showNotification(title: string, options?: NotificationOptions) {
+    console.log('[NotificationService] Attempting to show notification:', title);
+    
     const permission = await this.requestPermission();
     
     if (permission !== 'granted') {
-      console.warn('[NotificationService] Notification permission denied');
+      console.warn('[NotificationService] Notification permission denied:', permission);
       return;
     }
 
@@ -70,28 +72,60 @@ class NotificationService {
     };
 
     const finalOptions = { ...defaultOptions, ...options };
+    console.log('[NotificationService] Final notification options:', finalOptions);
 
-    if (this.registration) {
-      // Service Worker를 통한 알림 (백그라운드에서도 작동)
-      // Service Worker에서는 actions 지원
-      const swOptions = {
-        ...finalOptions,
-        actions: [
-          {
-            action: 'open',
-            title: '앱 열기',
-            icon: '/icon-192x192.png'
-          },
-          {
-            action: 'dismiss',
-            title: '닫기'
-          }
-        ]
-      };
-      await this.registration.showNotification(title, swOptions);
-    } else {
-      // 일반 브라우저 알림 (actions 제외)
-      new Notification(title, finalOptions);
+    try {
+      if (this.registration?.showNotification) {
+        // Service Worker를 통한 알림 (백그라운드에서도 작동)
+        console.log('[NotificationService] Using Service Worker notification');
+        
+        const swOptions = {
+          ...finalOptions,
+          actions: [
+            {
+              action: 'open',
+              title: '앱 열기',
+              icon: '/icon-192x192.png'
+            },
+            {
+              action: 'dismiss',
+              title: '닫기'
+            }
+          ]
+        };
+        
+        await this.registration.showNotification(title, swOptions);
+        console.log('[NotificationService] Service Worker notification sent');
+      } else {
+        // 일반 브라우저 알림 (actions 제외)
+        console.log('[NotificationService] Using browser Notification API');
+        
+        const notification = new Notification(title, finalOptions);
+        
+        // 알림 이벤트 리스너 추가
+        notification.onclick = () => {
+          console.log('[NotificationService] Notification clicked');
+          window.focus();
+          notification.close();
+        };
+        
+        notification.onshow = () => {
+          console.log('[NotificationService] Notification shown');
+        };
+        
+        notification.onerror = (error) => {
+          console.error('[NotificationService] Notification error:', error);
+        };
+        
+        notification.onclose = () => {
+          console.log('[NotificationService] Notification closed');
+        };
+        
+        console.log('[NotificationService] Browser notification created:', notification);
+      }
+    } catch (error) {
+      console.error('[NotificationService] Error showing notification:', error);
+      throw error;
     }
   }
 
@@ -260,6 +294,65 @@ class NotificationService {
       hasSchedule: !!localStorage.getItem('notificationScheduleId'),
       serviceWorkerReady: !!this.registration
     };
+  }
+
+  /**
+   * 크롬에서 알림 문제 진단
+   */
+  async diagnoseNotificationIssues() {
+    const issues = [];
+    
+    // 1. 기본 지원 여부
+    if (!('Notification' in window)) {
+      issues.push('브라우저가 알림을 지원하지 않습니다.');
+    }
+    
+    // 2. 권한 상태
+    const permission = this.getPermissionStatus();
+    if (permission === 'denied') {
+      issues.push('알림 권한이 거부되었습니다. 브라우저 설정에서 허용해주세요.');
+    } else if (permission === 'default') {
+      issues.push('알림 권한을 요청해야 합니다.');
+    }
+    
+    // 3. Service Worker 상태
+    if (!this.registration) {
+      issues.push('Service Worker가 준비되지 않았습니다.');
+    }
+    
+    // 4. 사이트별 설정 확인 (가능한 경우)
+    try {
+      const permissions = await navigator.permissions?.query({ name: 'notifications' as PermissionName });
+      if (permissions?.state === 'denied') {
+        issues.push('사이트별 알림 권한이 거부되었습니다.');
+      }
+    } catch (e) {
+      // 일부 브라우저에서는 지원하지 않음
+    }
+    
+    return {
+      hasIssues: issues.length > 0,
+      issues,
+      recommendations: this.getRecommendations(issues)
+    };
+  }
+
+  private getRecommendations(issues: string[]) {
+    const recommendations = [];
+    
+    if (issues.some(issue => issue.includes('권한'))) {
+      recommendations.push('브라우저 주소창 왼쪽의 자물쇠 아이콘을 클릭하여 알림을 허용해주세요.');
+      recommendations.push('chrome://settings/content/notifications 에서 이 사이트의 알림 설정을 확인해주세요.');
+    }
+    
+    if (issues.some(issue => issue.includes('Service Worker'))) {
+      recommendations.push('페이지를 새로고침하여 Service Worker를 다시 로드해보세요.');
+    }
+    
+    recommendations.push('운영체제의 알림 설정에서 크롬 브라우저 알림이 활성화되어 있는지 확인해주세요.');
+    recommendations.push('방해 금지 모드나 집중 모드가 활성화되어 있지 않은지 확인해주세요.');
+    
+    return recommendations;
   }
 }
 
