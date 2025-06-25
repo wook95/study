@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import CreateStudyModal from "../components/CreateStudyModal";
+import PWAInstallButton from "../components/PWAInstallButton";
 import StudyCard from "../components/StudyCard";
 import TodayTodos from "../components/TodayTodos";
 import { Button } from "../components/ui/button";
@@ -63,6 +64,9 @@ export default function HomePage() {
   return (
     <>
       <div className="space-y-8">
+        {/* PWA 설치 버튼 */}
+        <PWAInstallButton />
+
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <div>

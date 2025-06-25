@@ -8,6 +8,7 @@ import { authApi } from "@/lib/supabase";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import NotificationTest from "../components/NotificationTest";
 
 export default function ProfilePage() {
   const { user, signOut } = useAuth();
@@ -281,6 +282,9 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* 알림 테스트 섹션 */}
+          <NotificationTest />
         </div>
       </div>
     </div>
