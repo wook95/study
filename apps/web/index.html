@@ -6,16 +6,22 @@
     <!-- PWA Meta Tags -->
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <meta name="theme-color" content="#667eea" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="스터디완주" />
     <meta
       name="description"
       content="매일 꾸준한 독서 습관을 만들어주는 스터디 완주 앱"
     />
+
+    <!-- iOS PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="스터디완주" />
+    <meta name="format-detection" content="telephone=no" />
 
     <!-- App Title -->
     <title>스터디 완주 - 독서 습관 만들기</title>
@@ -23,27 +29,20 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/icon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/icon-192x192.png" />
+    <!-- Favicon -->
+    <link rel="icon" href="/icon-192x192.png" type="image/png" />
+
+    <!-- Apple Touch Icons (iOS에서 가장 중요) -->
+    <link rel="apple-touch-icon" href="/icon-192x192.png" />
     <link rel="apple-touch-icon" sizes="152x152" href="/icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="144x144" href="/icon-144x144.png" />
-    <link rel="apple-touch-icon" sizes="120x120" href="/icon-128x128.png" />
-    <link rel="apple-touch-icon" sizes="114x114" href="/icon-128x128.png" />
-    <link rel="apple-touch-icon" sizes="76x76" href="/icon-96x96.png" />
-    <link rel="apple-touch-icon" sizes="72x72" href="/icon-72x72.png" />
-    <link rel="apple-touch-icon" sizes="60x60" href="/icon-72x72.png" />
-    <link rel="apple-touch-icon" sizes="57x57" href="/icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-192x192.png" />
+
+    <!-- iOS Splash Screen -->
+    <link rel="apple-touch-startup-image" href="/icon-512x512.png" />
 
     <!-- Microsoft Tiles -->
     <meta name="msapplication-TileColor" content="#667eea" />
     <meta name="msapplication-TileImage" content="/icon-144x144.png" />
-    <meta name="msapplication-config" content="/browserconfig.xml" />
-
-    <!-- Splash Screens for iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <link rel="apple-touch-startup-image" href="/icon-512x512.png" />
 
     <!-- Preload Critical Resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,6 +54,11 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
+      // iOS PWA 감지
+      const isIOSPWA = window.navigator.standalone === true;
+      const isIOSSafari =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
@@ -62,12 +66,15 @@
             .then((registration) => {
               console.log("SW registered: ", registration);
 
-              // 푸시 알림 권한 요청
-              if ("Notification" in window && "PushManager" in window) {
+              // iOS PWA에서도 알림 권한 요청
+              if ("Notification" in window) {
                 if (Notification.permission === "default") {
-                  Notification.requestPermission().then((permission) => {
-                    console.log("Notification permission:", permission);
-                  });
+                  // iOS에서는 사용자 상호작용 후에 권한 요청
+                  if (isIOSPWA || !isIOSSafari) {
+                    Notification.requestPermission().then((permission) => {
+                      console.log("Notification permission:", permission);
+                    });
+                  }
                 }
               }
             })
@@ -77,14 +84,13 @@
         });
       }
 
-      // PWA 설치 프롬프트 처리
+      // PWA 설치 프롬프트 처리 (Android/Chrome)
       let deferredPrompt;
       window.addEventListener("beforeinstallprompt", (e) => {
         e.preventDefault();
         deferredPrompt = e;
         console.log("PWA install prompt available");
 
-        // 나중에 사용할 수 있도록 이벤트 저장
         window.showInstallPrompt = () => {
           if (deferredPrompt) {
             deferredPrompt.prompt();
@@ -100,6 +106,15 @@
       window.addEventListener("appinstalled", (evt) => {
         console.log("PWA was installed");
       });
+
+      // iOS 전용: 홈 화면 추가 안내
+      if (isIOSSafari && !isIOSPWA) {
+        console.log(
+          "iOS Safari detected - PWA can be installed via Share menu"
+        );
+      } else if (isIOSPWA) {
+        console.log("Running as iOS PWA");
+      }
     </script>
   </body>
 </html>
