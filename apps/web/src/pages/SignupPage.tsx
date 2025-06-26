@@ -4,11 +4,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -33,15 +33,17 @@ export default function SignupPage() {
 
   const signupMutation = useMutation({
     mutationFn: (data: SignupData) => authApi.signUp(data),
-    onSuccess: () => {
+    onSuccess: (response) => {
       // 이메일 확인 대기 상태 저장
       localStorage.setItem("pending_verification_email", email);
 
       toast({
         title: "회원가입 성공",
-        description: "이메일 확인 후 로그인해주세요.",
+        description: "이메일 확인을 위해 메일을 확인해주세요.",
       });
-      navigate("/login");
+      
+      // 이메일 인증 대기 페이지로 리다이렉트
+      navigate(`/email-verification-pending?email=${encodeURIComponent(email)}`);
     },
     onError: (error: Error) => {
       toast({

@@ -15,6 +15,7 @@ import SignupPage from "./pages/SignupPage";
 import StatisticsPage from "./pages/StatisticsPage";
 import StudyPage from "./pages/StudyPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import EmailVerificationPendingPage from "./pages/EmailVerificationPendingPage";
 
 // React Query 클라이언트 설정
 const queryClient = new QueryClient({
@@ -40,6 +41,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/verify-email" element={<VerifyEmailPage />} />
+              <Route path="/email-verification-pending" element={<EmailVerificationPendingPage />} />
 
               {/* 보호된 페이지들 - 로그인 필요 */}
               <Route

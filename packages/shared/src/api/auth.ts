@@ -29,6 +29,9 @@ const getBaseUrl = () => {
 };
 
 export const createAuthApi = (supabase: SupabaseClient) => ({
+  // Supabase 클라이언트에 직접 접근할 수 있도록 추가
+  supabase,
+
   // 회원가입
   signUp: async ({ email, password, displayName }: SignUpData) => {
     const baseUrl = getBaseUrl();
